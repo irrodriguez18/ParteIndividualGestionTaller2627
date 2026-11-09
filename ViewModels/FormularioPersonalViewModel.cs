@@ -31,9 +31,10 @@ public partial class FormularioPersonalViewModel : ViewModelBase, IModalFormular
 
         if (p != null)
         {
+            //Marcar como True las que tenga PersonalAsignadoDTO "p"
             for (int i=0; i<ReparacionesAsignadas.Count; i++)
             {
-                if (p.ReparacionesAsignadas.Equals(ReparacionesAsignadas[i].IdReparacion))
+                if (p.ReparacionesAsignadas.Contains(ReparacionesAsignadas[i].IdReparacion))
                 {
                     ReparacionesAsignadas[i] =
                         new SeleccionReparacion

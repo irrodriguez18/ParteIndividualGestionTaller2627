@@ -77,7 +77,7 @@ public class ContenedorDatos{
         else {return CodigoValidacion.PersonalDeleteUnexpected;}
     }
 
-    public CodigoValidacion ActualizarPersonal(string dni, string nombre, string email, List<string> reparacionesAsignadas)
+    public CodigoValidacion ActualizarPersonal(string dni, string nombre, string email, List<string>? reparacionesAsignadas = null)
     {
         IQueryable<Personal> query = _listaPersonal.AsQueryable();
 
@@ -91,9 +91,11 @@ public class ContenedorDatos{
         List<string> reparacionesActuales = [.. _listaAsignaciones.Where( a => a.Dni.Equals(dni) )
                                                 .Select( a => a.IdReparacion)
                                                 .OrderBy( a => a ) ];
+
         if (datosActuales.Nombre.Equals(nombre)
             && datosActuales.Email.Equals(email)
-            && reparacionesActuales.SequenceEqual(reparacionesAsignadas.OrderBy( a => a )))
+            && reparacionesActuales == null
+            || reparacionesActuales.SequenceEqual(reparacionesAsignadas.OrderBy( a => a )))
         {
             return CodigoValidacion.PersonalModificationSameValues;
         }
@@ -118,7 +120,14 @@ public class ContenedorDatos{
         _listaPersonal.Remove(datosActuales);
         _listaPersonal.Add(new Personal(dni, nombre, email));
 
-        //TODO Cambiar asignaciones
+        if (reparacionesAsignadas != null)
+        {
+            _listaAsignaciones.RemoveAll( a => a.Dni.Equals(dni) );
+            foreach (string idReparacion in reparacionesAsignadas)
+            {
+                _listaAsignaciones.Add(new AsignacionReparacion(dni, idReparacion));
+            }
+        }
 
         return CodigoValidacion.Ok;
     }
@@ -145,11 +154,6 @@ public class ContenedorDatos{
 
         if (_listaReparaciones.RemoveAll( p => p.Id.Equals(idReparacion) ) > 0) {return CodigoValidacion.Ok;}
         else {return CodigoValidacion.ReparacionDeleteUnexpected;}
-    }
-
-    public CodigoValidacion ActualizarReparacion(string idReparacion)
-    {
-        return CodigoValidacion.Ok;
     }
 
     private CodigoValidacion AñadirAsignacion(string dni, string idReparacion)

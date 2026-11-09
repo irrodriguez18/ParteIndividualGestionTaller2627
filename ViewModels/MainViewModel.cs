@@ -132,7 +132,6 @@ public partial class MainViewModel : ViewModelBase
         
     }
 
-    //TODO
     [RelayCommand]
     private async Task MostrarFormEntidad(PersonalAsignadoDTO? p)
     {
@@ -146,11 +145,18 @@ public partial class MainViewModel : ViewModelBase
         {
             var resultado = await modal.ShowDialog<bool>(desktop.MainWindow);
             
-            //Comprobar que ha ido todo bien y que se ha creado un PersonalAsignadoDTO
-            PersonalAsignadoDTO nuevo = formModal.MiPersonal;
+            PersonalAsignadoDTO nuevoP = formModal.MiPersonal;
             if (resultado && formModal.MiPersonal != null)
             {
-                _datosTaller.AñadirPersonal(nuevo.Dni, nuevo.Nombre, nuevo.Email, nuevo.ReparacionesAsignadas);
+                //Si pasaron personal => Update. Sino => Add
+                if (p != null){
+                    _datosTaller.ActualizarPersonal(nuevoP.Dni, nuevoP.Nombre,
+                                    nuevoP.Email, nuevoP.ReparacionesAsignadas);
+                }
+                else{
+                    _datosTaller.AñadirPersonal(nuevoP.Dni, nuevoP.Nombre,
+                                    nuevoP.Email, nuevoP.ReparacionesAsignadas);
+                }
             }
 
             RefrescarTabla();
@@ -158,22 +164,10 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    public void ModificarPersonalCommand(PersonalAsignadoDTO p)
-    {
-        
-    }
-
-    [RelayCommand]
     public void EliminarPersonalCommand(PersonalAsignadoDTO p)
     {
         _datosTaller.EliminarPersonal(p.Dni);
         RefrescarTabla();
-    }
-
-    [RelayCommand]
-    public void ModificarReparacionCommand(ReparacionDTO r)
-    {
-        
     }
 
     [RelayCommand]
