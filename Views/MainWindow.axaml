@@ -1,0 +1,113 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:New.ViewModels"
+        xmlns:m="using:New.Models"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="New.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="New"
+        Width="800" Height="600"
+        MinWidth="600" MinHeight="450">
+
+    <Design.DataContext>
+        <vm:MainViewModel />
+    </Design.DataContext>
+
+    <Window.DataTemplates>
+
+        <DataTemplate DataType="vm:TablaPersonalViewModel">
+            <TableView ItemsSource="{Binding ListaDatosFiltrada}">
+                <TableView.Columns>
+                    <TableViewColumn Header="DNI" Binding="{Binding Dni}" />
+                    <TableViewColumn Header="Nombre" Binding="{Binding Nombre}" />
+                    <TableViewColumn Header="Email" Binding="{Binding Email}" />
+                    <TableViewColumn Header="Reparaciones" Binding="{Binding TextoAsignaciones}" />
+                    <TableViewColumn Header="Acciones" Width="180">
+                        <TableViewColumn.CellTemplate>
+                            <DataTemplate DataType="m:PersonalAsignadoDTO">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Button Content="Modificar"
+                                            Command="{Binding $parent[Window].DataContext.ModificarPersonalCommand}"
+                                            CommandParameter="{Binding}"/>
+                                    <Button Content="Borrar"
+                                            Command="{Binding $parent[Window].DataContext.EliminarPersonalCommand}"
+                                            CommandParameter="{Binding}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </TableViewColumn.CellTemplate>
+                    </TableViewColumn>
+                </TableView.Columns>
+            </TableView>
+        </DataTemplate>
+
+        <DataTemplate DataType="vm:TablaReparacionesViewModel">
+            <TableView ItemsSource="{Binding ListaDatosFiltrada}">
+                <TableView.Columns>
+                    <TableViewColumn Header="Id reparacion" Binding="{Binding Id}" />
+                    <TableViewColumn Header="Acciones" Width="180">
+                        <TableViewColumn.CellTemplate>
+                            <DataTemplate DataType="m:ReparacionDTO">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Button Content="Modificar"
+                                            Command="{Binding $parent[Window].DataContext.ModificarReparacionCommand}"
+                                            CommandParameter="{Binding}"/>
+                                    <Button Content="Borrar"
+                                            Command="{Binding $parent[Window].DataContext.EliminarReparacionCommand}"
+                                            CommandParameter="{Binding}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </TableViewColumn.CellTemplate>
+                    </TableViewColumn>
+                </TableView.Columns>
+            </TableView>
+        </DataTemplate>
+
+    </Window.DataTemplates>
+
+    <Grid RowDefinitions="Auto, *" ShowGridLines="True">
+
+        <Border Grid.Row="0" Padding="10">
+            <DockPanel LastChildFill="False">
+                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Spacing="10">
+                    <Button Command="{Binding GuardarDatosCommand}">Save</Button>
+                    <Button Command="{Binding CargarDatosCommand}" CommandParameter="datosTaller.xml">Load</Button>
+                </StackPanel>
+
+                <ComboBox DockPanel.Dock="Right" Width="100" SelectedIndex="0" VerticalAlignment="Center">
+                    <ComboBoxItem Content="Español"/>
+                    <ComboBoxItem Content="English"/>
+                </ComboBox>
+            </DockPanel>
+        </Border>
+
+        <Grid Grid.Row="1" ColumnDefinitions="2*, 8*" ShowGridLines="True">
+            
+            <StackPanel Grid.Column="0" Spacing="10" HorizontalAlignment="Center">
+                <Button Command="{Binding SeleccionarEntidadCommand}"
+                        CommandParameter="{x:Static vm:EntidadAMostrar.Personal}"
+                        HorizontalAlignment="Stretch" Background="LightBlue">Personal</Button>
+
+                <Button Command="{Binding SeleccionarEntidadCommand}"
+                        CommandParameter="{x:Static vm:EntidadAMostrar.Reparacion}"
+                        HorizontalAlignment="Stretch" Background="LightBlue">Reparaciones</Button>
+            </StackPanel>
+
+            <Grid Grid.Column="1" RowDefinitions="50, 50, *">
+            
+                <TextBox Grid.Row="0" Margin="10" Text="{Binding TextoBusqueda, Mode=TwoWay}" HorizontalAlignment="Stretch"/>
+
+                <StackPanel Grid.Row="1" Spacing="10" Orientation="Horizontal">
+                    <Button Command="{Binding MostrarFormEntidadCommand}">Add</Button>
+                </StackPanel>
+
+                <ContentControl Grid.Row="2" Content="{Binding TablaActiva}" />
+
+            </Grid>
+
+        </Grid>
+    </Grid>
+
+</Window>
