@@ -100,7 +100,7 @@
 
             <Grid Grid.Column="1" RowDefinitions="50, 50, *">
             
-                <TextBox Grid.Row="0" Margin="10" Text="{Binding TextoBusqueda, Mode=TwoWay}" HorizontalAlignment="Stretch"/>
+                <TextBox Grid.Row="0" Margin="10" Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch"/>
 
                 <StackPanel Grid.Row="1" Spacing="10" Orientation="Horizontal">
                     <Button Command="{Binding MostrarFormEntidadCommand}">Add</Button>

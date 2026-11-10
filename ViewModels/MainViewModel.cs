@@ -27,7 +27,6 @@ public partial class MainViewModel : ViewModelBase
     private EntidadAMostrar _entidadSeleccionada = EntidadAMostrar.None;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(TablaActiva))]
     private string _textoBusqueda = string.Empty;
 
     public MainViewModel()
@@ -43,43 +42,52 @@ public partial class MainViewModel : ViewModelBase
         {
             _entidadSeleccionada = entidadNueva;
             TextoBusqueda = string.Empty;
-
-            switch (_entidadSeleccionada)
-            {
-                case EntidadAMostrar.Personal:
-                    //TODO Hacer búsqueda por cada campo, no sólo por DNI
-                    IEnumerable<Personal> listaPersonalFiltrado = _datosTaller.ListaPersonal;
-                    if(!string.IsNullOrEmpty(TextoBusqueda)){
-                        listaPersonalFiltrado = [.. listaPersonalFiltrado.Where( p => p.Dni.Contains(TextoBusqueda.Trim()) )];
-                    }
-
-                    //Crear DTOs
-                    List<PersonalAsignadoDTO> listaPersonalAsignado = [.. listaPersonalFiltrado.Select(
-                        p => new PersonalAsignadoDTO
-                        {
-                            Dni = p.Dni,
-                            Nombre = p.Nombre,
-                            Email = p.Email,
-                            ReparacionesAsignadas = [.. _datosTaller.ListaAsignaciones
-                                                        .Where (a => a.Dni.Equals(p.Dni))
-                                                        .Select(a => a.IdReparacion)]
-                        })];
-                    TablaActiva = new TablaPersonalViewModel(listaPersonalAsignado);
-                    break;
-                default: //Reparacion
-                    IEnumerable<Reparacion> listaReparacionFiltrada = _datosTaller.ListaReparaciones;
-                    if(!string.IsNullOrEmpty(TextoBusqueda)){
-                        listaReparacionFiltrada = [.. listaReparacionFiltrada.Where( r => r.Id.Contains(TextoBusqueda.Trim()) )];
-                    }
-
-                    List<ReparacionDTO> listaReparacionDTO = [.. listaReparacionFiltrada.Select( r => new ReparacionDTO
-                    {
-                        Id = r.Id
-                    })];
-                    TablaActiva = new TablaReparacionesViewModel(listaReparacionDTO);
-                    break;
-            }
+            CargarListaDatos();
         }
+    }
+
+    private void CargarListaDatos()
+    {
+        switch (_entidadSeleccionada)
+        {
+            case EntidadAMostrar.Personal:
+                //TODO Hacer búsqueda por cada campo, no sólo por DNI
+                IEnumerable<Personal> listaPersonalFiltrado = _datosTaller.ListaPersonal;
+                if(!string.IsNullOrEmpty(TextoBusqueda)){
+                    listaPersonalFiltrado = [.. listaPersonalFiltrado.Where( p => p.Dni.Contains(TextoBusqueda.Trim()) )];
+                }
+
+                //Crear DTOs
+                List<PersonalAsignadoDTO> listaPersonalAsignado = [.. listaPersonalFiltrado.Select(
+                    p => new PersonalAsignadoDTO
+                    {
+                        Dni = p.Dni,
+                        Nombre = p.Nombre,
+                        Email = p.Email,
+                        ReparacionesAsignadas = [.. _datosTaller.ListaAsignaciones
+                                                    .Where (a => a.Dni.Equals(p.Dni))
+                                                    .Select(a => a.IdReparacion)]
+                    })];
+                TablaActiva = new TablaPersonalViewModel(listaPersonalAsignado);
+                break;
+            default: //Reparacion
+                IEnumerable<Reparacion> listaReparacionFiltrada = _datosTaller.ListaReparaciones;
+                if(!string.IsNullOrEmpty(TextoBusqueda)){
+                    listaReparacionFiltrada = [.. listaReparacionFiltrada.Where( r => r.Id.Contains(TextoBusqueda.Trim()) )];
+                }
+
+                List<ReparacionDTO> listaReparacionDTO = [.. listaReparacionFiltrada.Select( r => new ReparacionDTO
+                {
+                    Id = r.Id
+                })];
+                TablaActiva = new TablaReparacionesViewModel(listaReparacionDTO);
+                break;
+        }
+    }
+
+    partial void OnTextoBusquedaChanged(string? oldValue, string newValue)
+    {
+        CargarListaDatos();
     }
 
     [RelayCommand]
